@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Past Stock Analysis</title>
+  <style>
+    body {
+      background-image: url('https://images.pexels.com/photos/257904/pexels-photo-257904.jpeg');
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      color: white;
+      text-align: center;
+      padding: 40px;
+    }
+    form {
+      background: rgba(0, 0, 0, 0.7);
+      display: inline-block;
+      padding: 25px 35px;
+      border-radius: 10px;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .suggestions {
+      background: #fff;
+      color: #000;
+      text-align: left;
+      max-height: 150px;
+      overflow-y: auto;
+      position: absolute;
+      width: 300px;
+      border: 1px solid #ccc;
+      z-index: 1000;
+      border-radius: 5px;
+    }
+    .suggestions div {
+      padding: 8px;
+      cursor: pointer;
+    }
+    .suggestions div:hover {
+      background-color: #eee;
+    }
+    #result {
+      margin-top: 40px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      display: inline-block;
+      max-width: 90%;
+      color: #333;
+      text-align: left;
+    }
+    #back-btn {
+      margin-top: 20px;
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      background-color: #28a745;
+      padding: 8px 15px;
+      border-radius: 5px;
+    }
+    #back-btn:hover {
+      background-color: #1e7e34;
+    }
+  </style>
+</head>
+<body>
+  <h2>📈 Past Stock Analysis</h2>
+
+  <form id="pastForm">
+    <input type="text" id="stockInput" placeholder="Enter stock name..." autocomplete="off" />
+    <div id="suggestions" class="suggestions"></div>
+    <br>
+    <input type="date" id="startDate" />
+    <input type="date" id="endDate" />
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <div id="result"></div>
+
+  <br><br>
+  <a href="/" id="back-btn">← Back to Home</a>
+
+  <script>
+    const input = document.getElementById("stockInput");
+    const suggestionsBox = document.getElementById("suggestions");
+    let selectedSymbol = "";
+
+    input.addEventListener("input", async () => {
+      const value = input.value.trim();
+      if (value.length < 1) {
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
+      const res = await fetch(`/get-stocks?q=${value}`);
+      const data = await res.json();
+
+      suggestionsBox.innerHTML = data.map(s =>
+        `<div onclick="selectSymbol('${s.symbol}', '${s.name}')">${s.name} (${s.symbol})</div>`
+      ).join('');
+    });
+
+    function selectSymbol(symbol, name) {
+      input.value = `${name} (${symbol})`;
+      selectedSymbol = symbol;
+      suggestionsBox.innerHTML = '';
+    }
+
+    document.getElementById("pastForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const start = document.getElementById("startDate").value;
+      const end = document.getElementById("endDate").value;
+
+      const res = await fetch("/past-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          symbol: selectedSymbol || input.value,
+          start_date: start,
+          end_date: end
+        })
+      });
+
+      const html = await res.text();
+      document.getElementById("result").innerHTML = html;
+    });
+  </script>
+</body>
+</html>

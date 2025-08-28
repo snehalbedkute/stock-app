@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Future Stock Prediction</title>
+    <style>
+        body {
+            background-image: url('https://images.pexels.com/photos/30572289/pexels-photo-30572289.jpeg');
+            background-size: cover;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+            padding-top: 5%;
+        }
+        #form-container {
+            background: rgba(0, 0, 0, 0.7);
+            display: inline-block;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        input, button {
+            padding: 10px;
+            margin-top: 10px;
+            width: 300px;
+            font-size: 16px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #back-btn {
+            margin-top: 20px;
+            display: inline-block;
+            color: white;
+            text-decoration: none;
+            background-color: #28a745;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        #back-btn:hover {
+            background-color: #1e7e34;
+        }
+        #result {
+            margin-top: 40px;
+            padding: 20px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            display: inline-block;
+            max-width: 90%;
+            color: #333;
+            text-align: left;
+        }
+        .suggestions {
+            background: #fff;
+            color: #000;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            width: 300px;
+            border: 1px solid #ccc;
+            z-index: 1000;
+            border-radius: 5px;
+        }
+        .suggestions div {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .suggestions div:hover {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div id="form-container">
+        <h2>🔮 Future Stock Prediction</h2>
+        <label for="symbolInput">Enter Stock Name:</label><br>
+        <input type="text" id="symbolInput" placeholder="e.g. Apple" autocomplete="off"><br>
+        <div id="suggestions" class="suggestions"></div>
+        <button onclick="submitSymbol()">Predict Future</button><br>
+        <a href="/" id="back-btn">← Back to Home</a>
+    </div>
+
+    <div id="result"></div>
+
+    <script>
+        const input = document.getElementById("symbolInput");
+        const suggestionsBox = document.getElementById("suggestions");
+        let selectedSymbol = "";
+
+        input.addEventListener("input", async () => {
+            const value = input.value.trim();
+            if (value.length < 1) {
+                suggestionsBox.innerHTML = "";
+                return;
+            }
+
+            const res = await fetch(`/get-stocks?q=${value}`);
+            const data = await res.json();
+
+            suggestionsBox.innerHTML = data.map(s =>
+                `<div onclick="selectSymbol('${s.symbol}', '${s.name}')">${s.name} (${s.symbol})</div>`
+            ).join('');
+        });
+
+        function selectSymbol(symbol, name) {
+            input.value = `${name} (${symbol})`;
+            selectedSymbol = symbol;
+            suggestionsBox.innerHTML = '';
+        }
+
+        function submitSymbol() {
+            const symbol = selectedSymbol || input.value.trim();
+            if (!symbol) {
+                alert("Please enter a stock name.");
+                return;
+            }
+
+            fetch('/future-data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol: symbol })
+            })
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('result').innerHTML = html;
+            })
+            .catch(err => {
+                document.getElementById('result').innerHTML =
+                    `<p style="color:red;">Error: ${err}</p>`;
+            });
+        }
+    </script>
+</body>
+</html>

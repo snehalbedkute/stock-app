@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Insight</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-image: url('https://images.pexels.com/photos/6770610/pexels-photo-6770610.jpeg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: rgba(255, 255, 255, 0.25); /* brightness control */
+      z-index: 0;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.65);
+      padding: 50px;
+      border-radius: 20px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      z-index: 1;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 38px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      background-color: #00bcd4;
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      margin: 10px;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #0097a7;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="container">
+    <h1>Welcome to Stock Insight</h1>
+    <!-- ✅ Flask-friendly links -->
+    <button class="btn" onclick="location.href='/past'">📉 Past Study</button>
+    <button class="btn" onclick="location.href='/future'">🔮 Future Prediction</button>
+  </div>
+</body>
+</html>
