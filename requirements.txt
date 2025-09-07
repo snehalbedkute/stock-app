@@ -3,6 +3,7 @@ Flask-Cors==4.0.0
 yfinance==0.2.38
 matplotlib==3.8.0
 vaderSentiment==3.3.2
-scikit-learn==1.3.2
+scikit-learn==1.5.2
 requests==2.31.0
 gunicorn==21.2.0
+
